@@ -1,0 +1,91 @@
+Compare the time performane between sfrob and sfrobu
+
+1.
+Measure the difference on a relavtively small input(not a regular file)
+
+time printf '*~BO *{_CIA *hXE]D *LER #@_GZY #E\\OX #^BO #FKPS #NEM\4' | ./sfrobu | od -ta
+real 0m0.020s
+user 0m0.000s
+sys  0m0.004s
+
+
+time printf '*~BO *{_CIA *hXE]D *LER #@_GZY #E\\OX #^BO #FKPS #NEM\4' | ./sfrob | od -ta
+real 0m0.014s
+user 0m0.000s
+sys  0m0.004s
+
+time printf '*~BO *{_CIA *hXE]D *LER #@_GZY #E\\OX #^BO #FKPS #NEM\4' | ./sfrobs | od -ta
+real 0m0.007s
+user 0m0.003s
+sys  0m0.008s
+
+
+Then I make a relatively large file using the command head --bytes=10000 /dev/urandom > bigfile.txt
+time cat bigfile.txt | ./sfrobu | od -ta
+real 0m0.012s
+user 0m0.004s
+sys  0m0.014s
+
+time cat bigfile.txt | ./sfrob | od -ta
+real 0m0.006s
+user 0m0.003s
+sys  0m0.004s
+
+time cat bigfile.txt | ./sfrobs | od -ta
+real 0m0.011s
+user 0m0.005s
+sys  0m0.010s
+
+
+
+command: head --bytes=100000 /dev/urandom > biggerfile.txt
+time cat biggerfile.txt | ./sfrobu | od -ta
+real 0m0.076s
+user 0m0.028s
+sys  0m0.088s
+
+
+time cat biggerfile.txt | ./sfrob | od -ta
+real 0m0.037s
+user 0m0.023s
+sys  0m0.013s
+
+time cat biggerfile.txt | ./sfrobs | od -ta
+real 0m0.039s
+user 0m0.021s
+sys  0m0.019s
+
+
+command: head --bytes=1000000 /dev/urandom > biggerfile.txt
+time cat biggestfile.txt | ./sfrobu | od -ta
+real 0m0.107s
+user 0m0.024s
+sys  0m0.152s
+
+time cat biggestfile.txt | ./sfrob | od -ta
+real 0m0.036s
+user 0m0.022s
+sys  0m0.012s
+
+time cat biggestfile.txt | ./sfrobs | od -ta
+real 0m0.036s
+user 0m0.013s
+sys  0m0.026s
+
+As we can see, the sfrobu always takes longer time than sfrob. This is because sfrobu uses the
+unbuffered I/O which is much slower. When the file size becomes larger, the time difference
+between sfrobu and sfrob also becomes larger. sfrobs is a little slower than sfrobu,
+and as the file becomes larger, time difference between sfrobs and sfrobu becomes smaller.
+
+
+
+2. Estimate the number of comparisons as a function of the number of input lines
+
+Lines    Comparisions
+37       235
+191      1201
+370      2740
+410      2940
+The number of comparisons as a function of input lines is almost nlog(n)
+where n is the number of lines.( it's actually a little smaller than nlog(n)).
+This make sense because the qsort has big O of nlog(n).

@@ -1,0 +1,60 @@
+1. Open Ubuntu terminal and check the setup:
+dpkg --get=selections | grep openssh
+
+There is no output so I had to install them.
+
+To install the OpenSSH, I use the command:
+   sudo apt-get install openssh-server
+   sudo apt-get update
+   sudo apt-get install openssh-client
+   sudo apt-get update
+
+
+2.Server steps:
+Generate public and private keys
+Command:  ssh-keygen
+
+Generate an account
+Command:  sudo useradd -d /home/username -m chengyu
+	  sudo passwd chengyu
+The output required me to enter the password.
+Then I enter the password and confirm it.
+
+Create .ssh directory for new user
+Command:  cd /home/username
+	  sudo mkdir .ssh
+
+Change ownership and permission on the .ssh directory:
+Command:  sudo chown -R chengyu .ssh
+          sudo chmod 700 .ssh
+
+Disable password-based authentication:
+
+Command:  sudo chmod 777 /etc/ssh/sshd_confif
+          nano /etc/ssh/sshd_config
+Then I manually change the password authentication option to no.
+
+I get my IP address using the command:ifconfig
+My address is 10.97.85.92
+
+
+3. Client steps:
+Generate public and private keys:
+Command:  ssh-keygen
+
+Copy the public key to the server for key-based authentication:
+Command:  ssh-copy-id -i chengyu@10.97.85.92
+
+Add private key to authentication agent(ssh-agent)
+Command:  ssh-add
+
+SSH to server
+Command:  ssh -X chengyu@10.97.85.92 (With X11 forwarding)
+
+My partner is Qingyi Zhao. I use the command: firefox
+on the remote host see whether it opens firefox on my computer.
+It works. 
+
+
+
+

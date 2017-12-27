@@ -1,0 +1,12 @@
+ The upper left window gives the structure of the repository.It
+gives the information including master,branch,head,commits.
+
+ The upper middle window gives the information about the committer's
+name and email address.
+
+ The upper right window shows the times of the commit.
+
+ The bottom left window shows the ChangeLog of the commits
+
+ The bottom right window shows a list of files that were impacted
+by the commit we selected. 

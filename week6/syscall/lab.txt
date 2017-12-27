@@ -1,0 +1,119 @@
+1. For tr2b.c, firstly I check the number of arguments and the length
+of "from" and "to". Then I check whether there are duplicates in the 
+"from". If any of those above does not satisfy the requirements, I use
+stderr to print the error message and return 1.
+   For the second part of this program, I use a while loop to read and check
+whether the byte is in the "from". I use getchar() to read the byte.
+If it is, replace it with its counterpart in "to" and print. Else, just print it
+out. I use putchar() to print the character.
+  Finally, I use gcc -o tr2b tr2b.c to compile and generate an executable.
+  I create a test.txt and do the test on my executable. It works fine.
+
+2. For tr2u.c, most of it is just like tr2b.c The only difference is that
+tr2u.c uses read and write to get and print character.
+   I compile this file and to the test on it. It works fine.
+
+3. First I use the command :
+ head --bytes=5000000 /dev/urandom > test1.txt
+to generate a large file that has 5000000 bytes.
+
+Copy one file to another: 
+command: strace -c ./tr2b 'h' 'g' < test1.txt > output1.txt
+The output is:
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.000980          12        79           read
+0.00    0.000000           0        77           write
+0.00    0.000000           0         2           open
+0.00    0.000000           0         2           close
+0.00    0.000000           0         4           fstat
+0.00    0.000000           0        10           mmap
+0.00    0.000000           0         4           mprotect
+0.00    0.000000           0         1           munmap
+0.00    0.000000           0         1           brk
+0.00    0.000000           0         1         1 access
+0.00    0.000000           0         1           execve
+0.00    0.000000           0         1           arch_prctl
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.000980                   183         1 total
+
+
+command:strace -c ./tr2u 'h' 'g' < test1.txt > output2.txt
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+57.33    0.142988           0   5000000           write
+42.67    0.106439           0   5000002           read
+0.00    0.000000           0         2           open
+0.00    0.000000           0         2           close
+0.00    0.000000           0         2           fstat
+0.00    0.000000           0         8           mmap
+0.00    0.000000           0         4           mprotect
+0.00    0.000000           0         1           munmap
+0.00    0.000000           0         1           brk
+0.00    0.000000           0         1         1 access
+0.00    0.000000           0         1           execve
+0.00    0.000000           0         1           arch_prctl
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.249427              10000025         1 total
+
+
+
+Copy one file to terminal:
+strace -c ./tr2b 'h' 'g' < test1.txt
+output:
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+98.95    0.003381           0     19977           write
+1.05    0.000036           0        79           read
+0.00    0.000000           0         2           open
+0.00    0.000000           0         2           close
+0.00    0.000000           0         4           fstat
+0.00    0.000000           0        10           mmap
+0.00    0.000000           0         4           mprotect
+0.00    0.000000           0         1           munmap
+0.00    0.000000           0         1           brk
+0.00    0.000000           0         1         1 access
+0.00    0.000000           0         1           execve
+0.00    0.000000           0         1           arch_prctl
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.003417                 20083         1 total
+
+
+
+strace -c ./tr2u 'h' 'g' < test1.txt
+output:
+% time     seconds  usecs/call     calls    errors syscall
+------ ----------- ----------- --------- --------- ----------------
+54.61    0.426827           0   5000000           write
+45.39    0.354796           0   5000002           read
+0.00    0.000000           0         2           open
+0.00    0.000000           0         2           close
+0.00    0.000000           0         2           fstat
+0.00    0.000000           0         8           mmap
+0.00    0.000000           0         4           mprotect
+0.00    0.000000           0         1           munmap
+0.00    0.000000           0         1           brk
+0.00    0.000000           0         1         1 access
+0.00    0.000000           0         1           execve
+0.00    0.000000           0         1           arch_prctl
+------ ----------- ----------- --------- --------- ----------------
+100.00    0.781623              10000025         1 total
+
+tr2u uses much more system calls than tr2b in both copying one file to
+another and copying a file to the terminal. It makes sense because
+tr2b uses buffered I/O which decrease the number of read/write system calls.
+
+4. Use time command to compare the performance
+
+command: time ./tr2b 'h' 'g' < test1.txt > output1.txt
+real	 0m0.176s
+user	 0m0.127s
+sys	 0m0.004s
+
+
+command:time ./tr2u 'h' 'g' < test1.txt > output2.txt
+real	     0m5.438s
+user	     0m0.255s
+sys	     0m5.139s
+
+tr2b is much faster because it has less system calls

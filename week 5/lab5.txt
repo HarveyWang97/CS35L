@@ -1,0 +1,72 @@
+  I first the download the coreutils from the website using the command
+wget http://web.cs.ucla.edu/classes/fall16/cs35L/assign/coreutils-with-bug.tar.gz
+  Then I use the command " ./configure" and "make".
+  The make command outputs:
+  make[3]: *** [Makefile:659: utimecmp.o] Error 1
+  make[3]: Leaving directory '/w/home.13/cs/ugrad/chengyu/cs35L/coreutils-with-bug/lib'
+  make[2]: *** [Makefile:414: all] Error 2
+  make[2]: Leaving directory '/w/home.13/cs/ugrad/chengyu/cs35L/coreutils-with-bug/lib'
+  make[1]: *** [Makefile:419: all-recursive] Error 1
+
+  The problem is that the old version has function naming problems. The futimens function
+has different parameters in different places.
+  To fix the problem, I first download the patch using the command
+  wget http://web.cs.ucla.edu/classes/fall16/cs35L/assign/coreutils.diff
+  Then I use the command: patch -p0 < coreutils.diff  to apply the patch.
+  After appyling the patch successfully, I do "./configure" and "make" again.
+This time make does not generate error messages.
+  The patch works because it changes the function futimes name to coreutils_futimens which has
+three parameters. Thus there are not renaming problems any more. 
+
+Reproduce the problem:
+  $ tmp=$(mktemp -d)
+  $ cd $tmp
+  $ touch -d '1918-11-11 11:00 GMT' wwi-armistice
+  $ touch now
+  $ sleep 1
+  $ touch now1
+  $ TZ=UTC0 /u/cs/ugrad/chengyu/cs35L/coreutils-with-bug/src/ls  -lt --full-time wwi-armistice now now1
+Then I see the output as:
+  -rw-r--r-- 1 chengyu csugrad 0 1918-11-11 11:00:00.000000000 +0000 wwi-armistice
+  -rw-r--r-- 1 chengyu csugrad 0 2016-10-28 07:21:27.247898121 +0000 now1
+  -rw-r--r-- 1 chengyu csugrad 0 2016-10-28 07:21:11.641483386 +0000 now
+which is incorrect.
+
+Debugging the program:
+I fisrt use emacs ls.c to study the source code and I found that the function cmp_mtime
+is responsible for comparing the modification time.
+Then I enter the gdb using the command: gdb ~/cs35L/coreutils-with-bug/src/ls
+Then I mark the break point:(gdb) break cmp_mtime
+Then I run the program: r -lt --full-time  /tmp/tmp.DfVJLNzm9N/wwi-armistice /tmp/tmp.DfVJLNzm9N/now /tmp/tmp.DfVJLNzm9N/now1
+I notice these two lines during steping:
+2884	 static int compare_mtime (V a, V b) { return cmp_mtime (a, b, xstrcoll); }
+timespec_cmp (b=..., a=...) at ../lib/timespec.h:48
+49	   return diff ? diff : a.tv_nsec - b.tv_nsec;
+48	   int diff = a.tv_sec - b.tv_sec;
+I use (gdb) info locals and I found diff turns to be a very negative number. Since the wwi-armistice
+file is very old, this negative number might be a consequence of inteter overflow.
+
+I enter the directory lib, and I copy timespec.h to another file newtimespec.h. I changed
+the code in newtimespec.h . This time, I just simply compare two numbers using < and > without
+doing subtraction, thus avoiding the overflow problem.
+Then I use diff -u timespec.h newtimespec.h > lab5.diff to generate the diff file.
+Then I use emacs to open lab5.diff and change the log entry using C-x 4 a.
+Finally, I go back to the directory coreutils-with-bug, doing the './configure' and 'make'
+again.
+
+I use the new version to test ls, and the output is
+-rw-r--r-- 1 chengyu csugrad 0 2016-10-28 07:21:27.247898121 +0000 now1
+-rw-r--r-- 1 chengyu csugrad 0 2016-10-28 07:21:11.641483386 +0000 now
+-rw-r--r-- 1 chengyu csugrad 0 1918-11-11 11:00:00.000000000 +0000 wwi-armistice
+which is correct.
+
+I reproduce the problem in the home direcotry. And the output is:
+-rw-r--r-- 1 chengyu csugrad 0 2054-12-17 17:28:16.000000000 +0000 wwi-armistice
+-rw-r--r-- 1 chengyu csugrad 0 2016-10-28 11:46:24.720478000 +0000 now1
+-rw-r--r-- 1 chengyu csugrad 0 2016-10-28 11:46:15.199606000 +0000 now
+The Seasnet server cannot recognize 1918 and transform it to a very future
+time 2054. The reason is that Seasnet NFS file system has 32-bit time stamps.
+However, local File system on Linux server has 64-bit time stamps.
+If you touch the files on the NFS filesystem, the upper 32 bits are truncated.
+and it will return timestamp around 2054.
+ 

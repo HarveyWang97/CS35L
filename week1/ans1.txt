@@ -1,0 +1,107 @@
+1. I use man -k to print all the commands that have
+ a specific word in their man page. 
+I use man man to find it. 
+
+2. cp is located in /bin/cp and wc is located in /usr/bin/wc. 
+I use the command which to find their locations. 
+
+3. There are three executable programs that
+ have names that are just one character long.  
+I use the command find /usr/bin -name ? -executable to find them. 
+X: a portable, network-transparent window system. 
+w: Show who is logged on and what they are doing.
+[ : A bash builtin. 
+I use the command man X, man w, man [[] to find what they do. 
+
+4. /etc/alternatives/emacs is actually executed. 
+  I use the command readlink /usr/bin/emacs to find it. 
+
+5.g+s means adding the permission to set user or group ID
+ on execution of other users who are members of the file's group.
+  o-x means removing the execute permission of other users
+ not in the file’s group. 
+  I use the command man chmod to find the information. 
+
+6. command : find -mtime -21. 
+  I use man find to find get the answer.
+
+7.
+I use the command find -type d -mtime -21 to find them. 
+ .
+./nsdefault
+./Desktop
+./Desktop/$RECYCLE.BIN
+./Documents
+./Documents/$RECYCLE.BIN
+./Downloads
+./Downloads/$RECYCLE.BIN
+./.emacs.d
+./.emacs.d/auto-save-list
+./cs35l
+./.cache
+./.cache/abrt
+./.config
+./.config/abrt
+./perl5
+Those are directories that have been modified in the last three weeks. 
+
+
+8. First, I use the command which find so I know that
+ the location of find command is /bin/find. 
+Then I use the command find /bin -type l to
+ find the symbolic links in the same directory as the find command. 
+There are 20.(lnxsrv04) 
+
+9. I first use the command cd /usr/lib.
+ Then I use the command ls -alt. The oldest file is libICE.so.6.3.0 
+
+10. Locale command gets data from environmental variables including
+ LC_CTYPE, LC_COLLATE,  LC_TIME, LC_NUMERIC, LC_MONETARY and LC_MESSAGES. 
+      I learn it through the command man locale
+
+11. Buffer-menu-sort, Buffer-menu-sort-by-column,
+ ibuffer-invert-sorting, ibuffer-toggle-sorting-mode. 
+      I use C-h a sort to find them. 
+
+12.    C-M-a runs the command beginning-of-defun. 
+       Move backward to the beginning of a defun.    
+       
+       C-M-b runs the command backward-sexp. 
+       Move backward across one balanced expression.
+       
+       C-M-c runs the command exit-recursive-edit. 
+       Exit from the innermost recursive edit or minibuffer.  
+       
+       C-M-d runs the command down-list.
+       Move forward down one level of parentheses. 
+       
+       C-M-e runs the command end-of-defun. 
+       Move forward to next end of defun.
+       
+       C-M-f runs the command forward-sexp.
+       Move forward across one balanced expression.
+      
+       C-M-g does not exist. 
+      
+       C-M-h runs the command mark-defun.
+       Put mark at end of this defun, point at beginning.	
+    I learn them through the command C-h k keystroke-I-typed-in. 
+
+13. “C-g runs the command keyboard-quit, which is an interactive compiled
+Lisp function. It is bound to C-g. (keyboard-quit). Signal a `quit' condition. 
+During execution of Lisp code, this character causes a quit directly.” 
+To be simple, it quits the current command. 
+I use the command C-h k C-g to find the information. 
+
+14. The yank function reinsert ("paste") the last stretch of killed text.
+More precisely, reinsert the stretch of
+ killed text most recently killed OR yanked. 
+I use the command C-h f yank to find it. 
+
+15. The difference between ls -l and the dired function 
+in emacs is that the dired function will 
+list all the files including
+ the hidden files that start their name with “.” 
+The command ls -l will not list hidden files. 
+Other than that, they give the same output. 
+I find it out by comparing their outputs.

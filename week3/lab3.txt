@@ -1,0 +1,44 @@
+1. Download the Coreutils 7.6 using the command
+ wget ftp://ftp.gnu.org/gnu/coreutils/coreutils-7.6.tar.gz
+ Extract the file
+ tar -xzvf coreutils-7.6.tar.gz
+
+2. Compile and install a copy of Coreutils into another directory:
+  ./configure --prefix=/u/cs/ugrad/chengyu/coreutils
+
+3. Then I go to the directory /u/cs/ugrad/chengyu/coreutils/bin and
+use ./ls -l /bin/bash to see the result.
+-rwxr-xr-x 1 root root 960392 2016-07-12 08:17 /bin/bash
+It's obviously of the buggy format. 
+
+4.I enter the directory coreutils-7.6. First I use the command make,
+and then I use the command make install.
+
+5.I enter the directory coreutils-7.6/src which contains ls.c
+Then I copy the content from Brady's patch and paste it into a file
+called pathchfile.diff. Then I use the command
+ patch -p2 patchfile.diff  to modify the ls.c. After patching the fie, first
+ use cd .. to return to the directory coreutils-7.6, use the command make
+ to recompile.
+
+6. Test the patch:
+Go to the directory ~/coreutils/bin. Use ./ls -l, I got the date of the
+buggy fotmat of YYYY-MM-DD. For example,
+-rwxr-xr-x 1 chengyu csugrad  90368 2016-10-11 19:47 whoami.
+Then I use /u/cs/ugrad/chengyu/coreutils-7.6/src/ls -l, I get the right format
+-rwxr-xr-x 1 chengyu csugrad  90368 Oct 11 19:47 whoami
+
+To test a file that is at least one year ago, I use the command
+touch. I change the lst modified time of file tsort in ~/coreutils/bin
+using the command touch -t 1302150000 tsort
+Then I use ./ls -l tsort, the output is
+-rwxr-xr-x 1 chengyu csugrad 117222 2013-02-15 00:00 tsort
+When I use /u/cs/ugrad/chengyu/coreutils-7.6/src/ls -l tsort, the output is 
+-rwxr-xr-x 1 chengyu csugrad 117222 Feb 15  2013 tsort
+
+The difference between outputing a file that is modified at least
+one year ago and a file recently modified is that the recent file
+output will include the specific time moments, but the file one year
+ago will only show the date.
+
+

@@ -1,0 +1,108 @@
+1. First set the local environment using export LC_ALL='C'
+
+2. sort the content of words and direct is to a file in the current directory
+: sort /usr/share/dict/words > words
+
+3. The output under different commands:
+tr -c 'A-Za-z' '[\n*]' < assign2.html:
+  Replace every character that is a not a upper case letter or a lower case
+letter with a new line. So the output only has A-z and a-z characters and many
+empty lines.
+
+tr -cs 'A-Za-z' '[\n*]' < assign2.html
+  Replace  the first character that does not belong to A-Z or a-z with a new
+line. The output starts with an empty line and then the alphabet words.
+
+tr -cs 'A-Za-z' '[\n*]' < assign2.html | sort
+   Direct the output of tr -cs 'A-Za-z' '[\n*]' < assign2.html as the input of
+the command sort. The output is in alphabetical order and the uppercase words
+come first, then the lower case words.
+
+tr -cs 'A-Za-z' '[\n*]' < assign2.html | sort -u
+  Compared to the last command, it also outputs the words in alphabetical
+order and the uppercase words come first. The difference is that the output
+this time has no repetitive words.
+
+tr -cs 'A-Za-z' '[\n*]' < assign2.html | sort -u | comm - words
+  It outputs three columns.
+  Column1:words unique to assign2.html. Such as wget
+  Column2:words unique to words file. Such as winged
+  Column3:words common to both assign2.html and words file. Such as you
+
+tr -cs 'A-Za-z' '[\n*]' < assign2.html | sort -u | comm -23 - words:
+  It outputs only one column compared to the last command. It only outputs
+the words unique in assign2.html. -23 suppresses the column2 and column3.
+
+4. First get a copy of the webpage using Wget command.
+  Then I use emacs buildwords.sh to create the shell.
+#!/bin/bash
+
+#turn the upper case to lower case
+tr '[:upper:]' '[:lower:]' |
+
+#remove all the English words 
+  sed '/<tr>/,/<\/td>/d'|
+
+#turn all the ` to '
+  sed "s/\`/\'/g" |
+
+#grab the Hawaian words that start with <td>
+grep '<td>' |
+
+#delete all the <td> tags
+sed 's/<td>//g' |
+
+#delete all the </td> tags
+sed 's/<\/td>//g' |
+
+#delete all the <u> tags
+sed 's/<u>//g' |
+
+#delete all the </u> tags
+sed 's/<\/u>//g' |
+
+#replace every comma with the new line
+sed 's/\,/\n/' |
+
+#replace the white space with the new line
+sed 's/ /\n/g' |
+
+#delete all the white space
+sed '/^\s*$/d' |
+
+#check and delete all the mispelling words
+sed "s/[^p^k^m^n^w^l^h^a^e^i^o^u^\']//g" |
+
+#sort and eliminate duplicates
+sort -u
+
+The above is the shell part. Then I use chmod +x buildwords to
+add the execution right to the shell.
+
+5.Spell checking
+a. First step is to check the misspelled English words.
+Command: cat assign2.html | tr -cs 'A-Za-z' '[\n*]' |
+tr '[:upper:]' '[:lower:]'| sort -u | comm -23 - words 
+> misspellEnglish
+
+Then I use the command wc -w misspellEnglish  to find
+the number. There are 38 misspelled English words.
+
+b. Check the misspelled Hawaiian words.
+Command: cat assign2.html | tr -cs "pk\'mnwlhaeiou" | tr '[:upper:]'
+ '[:lower:]' | sort -u | comm -23 - hwords > misspellhawaian
+
+Then I use the command wc -w misspellhawaian to find the number.
+There are 214 misspelled Hawaian words.
+
+Examples of words that are misspelled in English but not in Hawaiian:
+wget
+wiki
+td
+
+
+Examples of words that are misspelled in Hawaiian but not in English:
+like
+mail
+men
+me

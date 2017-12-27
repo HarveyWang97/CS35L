@@ -1,0 +1,27 @@
+2016-10-28  Chengyu Wang  <chengyu@lnxsrv07.seas.ucla.edu>
+
+        * newtimespec.h (timespec_cmp): Avoid overflow by simply comparing two nums without subtraction.
+
+--- timespec.h	2016-10-28 04:06:05.024528000 -0700
++++ newtimespec.h	2016-10-28 04:14:29.066942000 -0700
+@@ -45,7 +45,19 @@
+ static inline int
+ timespec_cmp (struct timespec a, struct timespec b)
+ {
+-  int diff = a.tv_sec - b.tv_sec;                                                                                     return diff ? diff : a.tv_nsec - b.tv_nsec;          
++  int result=0;
++  if(a.tv_sec<b.tv_sec)
++    result=-1;
++  if(a.tv_sec>b.tv_sec)
++    result=1;
++  if(result==0)
++    {
++      if (a.tv_nsec<b.tv_nsec)
++	result=-1;
++      if (a.tv_nsec>b.tv_nsec)
++	result=1;
++    }
++  return result;
+ }
+ 
+ # if ! HAVE_DECL_NANOSLEEP

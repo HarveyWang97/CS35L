@@ -1,0 +1,42 @@
+#!/bin/bash
+
+#turn the upper case to lower case
+tr '[:upper:]' '[:lower:]' |
+
+#remove all the English words 
+  sed '/<tr>/,/<\/td>/d'|
+
+#turn all the ` to '
+  sed "s/\`/\'/g" |
+
+#grab the Hawaian words that start with <td>
+grep '<td>' |
+
+#delete all the <td> tags
+sed 's/<td>//g' |
+
+#delete all the </td> tags
+sed 's/<\/td>//g' |
+
+#delete all the <u> tags
+sed 's/<u>//g' |
+
+#delete all the </u> tags
+sed 's/<\/u>//g' |
+
+
+
+#replace every comma with the new line
+sed 's/\,/\n/' |
+
+#replace the white space with the new line
+sed 's/ /\n/g' |
+
+#delete all the white space
+sed '/^\s*$/d' |
+
+#check and delete all the mispelling words
+sed "s/[^p^k^m^n^w^l^h^a^e^i^o^u^\']//g" |
+
+#sort and eliminate duplicates
+sort -u

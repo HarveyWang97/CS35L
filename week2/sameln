@@ -1,0 +1,64 @@
+#!/bin/bash
+
+dir=$1
+result=`ls $dir | sort`
+hiddenresult=`ls -a $dir | grep "^\." | sort`
+
+
+let count=0
+let countall=0
+declare -a array
+declare -a finalarray
+
+for FILE in $result
+ do
+  if [ -f "$dir/$FILE" ]
+  then
+    array[$count]="$dir/$FILE"
+    let count=count+1
+  elif [ ! -r "$dir/$FILE" ]
+  then
+     echo "$FILE is not readable"
+  fi
+done 
+
+#put the hidden files to the array
+for HFILE in $hiddenresult
+ do
+     if [ -f "$dir/$HFILE" ]
+     then
+	 finalarray[$countall]="$dir/$HFILE"
+	 let countall=countall+1
+     elif [ ! -r "$dir/$HFILE" ]
+     then
+	 echo "$HFILE is not readable"
+     fi
+done
+
+#combine the array
+size=$countall+$count
+for (( i=$countall,j=0;i<$size;i++,j++ ))
+do
+    finalarray[$i]=${array[$j]}
+done
+
+
+for(( k=0;k<$size;k++ ))
+do
+    for(( d=k+1;d<$size;d++ ))
+    do
+	cmp -s ${finalarray[$k]} ${finalarray[$d]}
+	if [ $? -eq 0 ]
+	then
+	    ln -f ${finalarray[$k]} ${finalarray[$d]}
+        fi
+    done
+done
+
+
+
+    
+    
+    
+
+ 

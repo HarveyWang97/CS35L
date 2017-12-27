@@ -1,0 +1,20 @@
+1.
+It's still safe. Because the other teams don't have the private keys, they
+could only see the encrypted bytes. They don't know how to decrypt them.
+
+If other teams had also tapped your keyboards and had observed all of your
+team's keystrokes, they would have known the password and username. However,
+they still don't have the private key. They can't detect the private key
+just through the access to the keyboard.So the network is still safe.
+
+If other teams had physical control of the USB, they have the access to
+the private key. Then they can decrypt the communicatons they want. The
+network is not safe anymore.
+
+2."gpg --verify" only checks that the target file and the detached signature
+match or not. It does not check who creates the file. The hacker can modify
+the data align with the change in the digital signature. The results still match.
+  A possbile improvement is that a third party can come in with a file
+of digital signatures. Then it can verify the signatures through comparison
+and confirm who created the file. 
+

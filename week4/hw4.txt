@@ -1,0 +1,34 @@
+2. I first enter the diffutils directory.
+Then I use the command: git checkout -b 'quote' 'v3.0'
+
+3.I use the command patch -p1 < quote-3.0-patch.txt.
+The output is:
+patching file src/cmp.c
+patching file src/diff.c
+patching file src/diff3.c
+patching file src/dir.c
+patching file src/sdiff.c
+patching file src/util.c
+
+5. I enter the emacs and used C-x 4 a to open the Changelog.
+Then I pasted the entries for the six modified C files.
+
+6. I first use the command git add .
+  Then I use the command git commit -F ChangeLog
+
+7. I use the command: git format-patch -1 --stdout  > formatted-patch.txt
+
+8. Partner's name:Xiaokai Qi
+   UID:004571675
+   First I use the command: git checkout -b 'partner' 'v3.0'
+   Then I use the command git am ria-formatted-patch.txt
+   Then I do the command ./bootstrap ./configure make make check
+   It turns that my partner's patch works.
+
+9. I use the make distdir command and it finally generates a fold
+named diffutils-3.0.1-e0a8. I entered it and checked the ChangeLog.
+It turns out my commit is shown and it works.
+
+10. I first use ssh -X chengyu@lnxsrvs.seas.ucla.edu
+Then I enter ~eggert/src/gnu/emacs and use command gitk.
+

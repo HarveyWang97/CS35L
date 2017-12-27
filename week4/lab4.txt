@@ -1,0 +1,123 @@
+1. Copy the Diffutils repository.
+Command: git clone  ~eggert/src/gnu/diffutils
+
+2. Get a log of changes
+Command: cd diffutils
+         git log > git-log.txt
+
+3.Get a list of tags
+Command : git tag > git-tags.txt
+
+4.First I find the name of the commit using the
+command: git log --grep="maint: quote 'like this'"
+Then I use the command
+git show 62ca21c8c1a5aa3488589dcb191a4ef04ae9ed4f > quote-patch.txt
+to put it into the target file
+
+5. command: git checkout v3.0
+
+6. I use the command: patch -p1 < quote-patch.txt
+The problem I encounter is that it kept asking me
+the file to patch. I skipped past those by typing RETURN.
+In the output, some hunks failed.
+
+7. Using the git status, we can see what's modified.
+The output is:
+HEAD detached at v3.0
+Changes not staged for commit:
+  (use "git add <file>..." to update what will be committed)
+  (use "git checkout -- <file>..." to discard changes in working directory)
+
+	modified:   NEWS
+	modified:   README
+	modified:   TODO
+	modified:   doc/diagmeet.note
+	modified:   ms/config.bat
+	modified:   ms/config.site
+	modified:   po/en.po
+	modified:   src/analyze.c
+	modified:   src/cmp.c
+	modified:   src/context.c
+	modified:   src/diff.c
+	modified:   src/diff.h
+	modified:   src/diff3.c
+	modified:   src/dir.c
+	modified:   src/ifdef.c
+	modified:   src/io.c
+	modified:   src/sdiff.c
+	modified:   src/side.c
+	modified:   src/system.h
+	modified:   src/util.c
+        modified:   tests/help-version
+
+Untracked files:
+  (use "git add <file>..." to include in what will be committed)
+
+	NEWS.orig
+	README-hacking.orig
+	README-hacking.rej
+	README.orig
+	README.rej
+	cfg.mk.orig
+	cfg.mk.rej
+	git-log.txt
+	git-tags.txt
+	ms/config.site.orig
+	quote-patch.txt
+	src/cmp.c.orig
+	src/context.c.orig
+	src/diff.c.orig
+	src/diff.c.rej
+	src/diff.h.orig
+	src/diff3.c.orig
+	src/diff3.c.rej
+	src/dir.c.orig
+	src/sdiff.c.orig
+	src/system.h.orig
+	src/util.c.orig
+	tests/help-version.orig
+
+no changes added to commit (use "git add" and/or "git commit -a")
+
+9. I open the NEWS,README,TODO,doc/diagmeet.note,ms/config.site,
+po/en.po,src/diff.h,tests/help-version.orig and use the command
+C-x v u to revert the changes in these files.
+For the c files I used C-x v = to open vc-diff. Then
+I searched through it looking for changes and I manually undo
+the hunk for the comment part using command C-u C-c C-a
+
+10.I open the src/*.c.rej file and find diff.c.rej and diff3.c.rej.
+I manually apply the changes to the original C files.
+
+11. I use git clean -f to remove the untracked files.
+
+
+12.
+First I use git status:
+      modified:   src/cmp.c
+      modified:   src/diff.c
+      modified:   src/diff3.c
+      modified:   src/dir.c
+      modified:   src/sdiff.c
+      modified:   src/util.c
+Then I use the command: git diff > patch-3.0-patch.txt
+
+13. I use the command:
+./bootstrap
+./configure
+make
+make check
+Then I check the result of "diff . -" and "diff --help"。
+The output for the first is:diff: cannot compare '-' to a directory
+For "diff-help", it also produces the right output that
+all the ` have been replaced by '.
+
+14.I move to the source file and copy all the c files into
+the directory using command: cp *.c ../../diffutils-3.0-patch
+Then I clone the original version into the directory
+diffutils-3.0 and checkout the version 3.0 Finally I use the command
+diffutils/src/diff -pru diffutils-3.0 diffutils-3.0-patch
+>quote-3.0-test.txt 
+
+15. I use the command: diff quote-3.0-test.txt quote-3.0-patch.txt
+There are a lot of differences and they are not innocuous.
